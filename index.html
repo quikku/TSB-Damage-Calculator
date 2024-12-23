@@ -94,6 +94,7 @@
             transform: scale(1.02);
         }
 
+        /* カスタムスクロールバー */
         ::-webkit-scrollbar {
             width: 10px;
         }
@@ -111,6 +112,7 @@
             background: var(--secondary-color);
         }
 
+        /* ダークモードトグル */
         .dark-mode-toggle {
             position: fixed;
             top: 1rem;
@@ -134,6 +136,7 @@
             transform: rotate(180deg);
         }
 
+        /* ダークモード */
         body.dark-mode {
             --background-color: #1f2937;
             --text-color: #f3f4f6;
@@ -226,13 +229,10 @@
             const armorToughness = parseFloat(document.getElementById('armorToughness').value);
             const reductionRate = parseFloat(document.getElementById('reductionRate').value) / 100;
 
-            // まずダメージ軽減率を適用
-            let damageAfterReduction = initialDamage * (1 - reductionRate);
-
-            // 次に防具によるダメージ軽減を計算
-            const damageReduction = Math.min(20, Math.max(armorPoints / 5, armorPoints - damageAfterReduction / (2 + armorToughness / 4)));
-            const armorMultiplier = 1 - damageReduction / 25;
-            const finalDamage = Math.max(0, damageAfterReduction * armorMultiplier);
+            const damageReduction = Math.min(20, Math.max(armorPoints / 5, armorPoints - initialDamage / (2 + armorToughness / 4)));
+            let damageMultiplier = 1 - damageReduction / 25;
+            damageMultiplier *= (1 - reductionRate);
+            const finalDamage = Math.max(0, initialDamage * damageMultiplier);
 
             const resultElement = document.getElementById('damageResult');
             resultElement.textContent = `受けるダメージ: ${finalDamage.toFixed(2)}`;
@@ -252,14 +252,10 @@
 
             while (high - low > 0.01) {
                 initialDamage = (low + high) / 2;
-                
-                // まずダメージ軽減率を適用
-                let damageAfterReduction = initialDamage * (1 - reductionRate);
-                
-                // 次に防具によるダメージ軽減を計算
-                const damageReduction = Math.min(20, Math.max(armorPoints / 5, armorPoints - damageAfterReduction / (2 + armorToughness / 4)));
-                const armorMultiplier = 1 - damageReduction / 25;
-                const calculatedFinalDamage = Math.max(0, damageAfterReduction * armorMultiplier);
+                const damageReduction = Math.min(20, Math.max(armorPoints / 5, armorPoints - initialDamage / (2 + armorToughness / 4)));
+                let damageMultiplier = 1 - damageReduction / 25;
+                damageMultiplier *= (1 - reductionRate);
+                const calculatedFinalDamage = Math.max(0, initialDamage * damageMultiplier);
 
                 if (calculatedFinalDamage < finalDamage) {
                     low = initialDamage;
